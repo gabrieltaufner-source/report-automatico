@@ -146,7 +146,18 @@ def _filter_rows(rows: list[dict], start: date, end: date) -> list[dict]:
 
 def _safe_float(v) -> float:
     try:
-        return float(str(v).replace("R$", "").replace("\xa0", "").replace(",", ".").strip())
+        if isinstance(v, (int, float)):
+            return float(v)
+        s = str(v).replace("R$", "").replace("\xa0", "").replace(" ", "").replace("%", "").strip()
+        if not s or s == "-" or s == "—":
+            return 0.0
+        if "," in s and "." in s:
+            # Formato brasileiro: 1.234,56 → remove . (milhar) e troca , por .
+            s = s.replace(".", "").replace(",", ".")
+        elif "," in s:
+            # Só vírgula: 1234,56 → 1234.56
+            s = s.replace(",", ".")
+        return float(s)
     except (TypeError, ValueError):
         return 0.0
 
