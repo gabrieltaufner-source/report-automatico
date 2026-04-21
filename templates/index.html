@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Report Automático</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      padding: 40px;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #111;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #888;
+      margin-bottom: 32px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #444;
+      margin-bottom: 6px;
+    }
+
+    select, input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 15px;
+      color: #111;
+      background: #fafafa;
+      outline: none;
+      transition: border-color 0.2s;
+      margin-bottom: 20px;
+    }
+
+    select:focus, input:focus {
+      border-color: #4f46e5;
+      background: #fff;
+    }
+
+    button {
+      width: 100%;
+      padding: 13px;
+      background: #4f46e5;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover { background: #4338ca; }
+    button:disabled { background: #a5b4fc; cursor: not-allowed; }
+
+    .erro {
+      margin-top: 16px;
+      padding: 12px 16px;
+      background: #fef2f2;
+      border: 1px solid #fca5a5;
+      border-radius: 8px;
+      color: #b91c1c;
+      font-size: 14px;
+      display: none;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: #aaa;
+      margin-top: -14px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Report Automático</h1>
+    <p class="subtitle">Gerador de relatórios semanais de marketing digital</p>
+
+    <form id="form">
+      <label for="cliente">Cliente</label>
+      <select id="cliente" name="cliente" required>
+        <option value="" disabled selected>Selecione o cliente</option>
+        {% for c in clients %}
+        <option value="{{ c.key }}">{{ c.nome }}</option>
+        {% endfor %}
+      </select>
+
+      <label for="periodo">Período analisado</label>
+      <input id="periodo" name="periodo" type="text" placeholder="ex: 14/04 a 20/04" required />
+      <p class="hint">Semana que será analisada no relatório</p>
+
+      <label for="periodo_comp">Período comparado</label>
+      <input id="periodo_comp" name="periodo_comp" type="text" placeholder="ex: 07/04 a 13/04" required />
+      <p class="hint">Semana anterior (para calcular variações)</p>
+
+      <button type="submit" id="btn">Gerar Relatório</button>
+      <div class="erro" id="erro"></div>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById("form").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const btn = document.getElementById("btn");
+      const erro = document.getElementById("erro");
+      erro.style.display = "none";
+      btn.disabled = true;
+      btn.textContent = "Gerando...";
+
+      const formData = new FormData(this);
+
+      try {
+        const res = await fetch("/gerar", { method: "POST", body: formData });
+
+        if (res.ok) {
+          const blob = await res.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          const cd = res.headers.get("Content-Disposition") || "";
+          const match = cd.match(/filename="?([^"]+)"?/);
+          a.download = match ? match[1] : "relatorio.pptx";
+          a.href = url;
+          a.click();
+          URL.revokeObjectURL(url);
+        } else {
+          const data = await res.json();
+          erro.textContent = data.erro || "Erro desconhecido.";
+          erro.style.display = "block";
+        }
+      } catch (err) {
+        erro.textContent = "Erro de conexão. Tente novamente.";
+        erro.style.display = "block";
+      }
+
+      btn.disabled = false;
+      btn.textContent = "Gerar Relatório";
+    });
+  </script>
+</body>
+</html>

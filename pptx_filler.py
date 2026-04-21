@@ -68,6 +68,22 @@ def _process_shapes(shapes, data: dict):
             _replace_in_para(para, data)
 
 
+def fill_template_to_buffer(tipo: str, data: dict) -> "io.BytesIO":
+    """Fill template and return in-memory buffer (for web download)."""
+    import io
+    BASE_DIR = os.path.dirname(__file__)
+    template_path = os.path.join(BASE_DIR, "templates", f"template_{tipo}.pptx")
+    if not os.path.exists(template_path):
+        raise FileNotFoundError(f"Template não encontrado: {template_path}")
+    prs = Presentation(template_path)
+    for slide in prs.slides:
+        _process_shapes(slide.shapes, data)
+    buf = io.BytesIO()
+    prs.save(buf)
+    buf.seek(0)
+    return buf
+
+
 def fill_template(tipo: str, data: dict, client_cfg: dict) -> str:
     """
     Open the correct template, fill all placeholders, and save.
