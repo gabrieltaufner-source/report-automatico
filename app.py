@@ -85,6 +85,8 @@ def gerar():
             try:
                 filename, buf = _gerar_um(key, periodo, periodo_comp)
                 zf.writestr(filename, buf.read())
+                buf.close()
+                del buf
             except Exception as e:
                 erros.append(f"{CONFIG[key]['nome']}: {e}")
 
