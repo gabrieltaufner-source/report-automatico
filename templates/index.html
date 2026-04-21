@@ -109,6 +109,7 @@
       <label for="cliente">Cliente</label>
       <select id="cliente" name="cliente" required>
         <option value="" disabled selected>Selecione o cliente</option>
+        <option value="todos">⚡ Todos os clientes</option>
         {% for c in clients %}
         <option value="{{ c.key }}">{{ c.nome }}</option>
         {% endfor %}
