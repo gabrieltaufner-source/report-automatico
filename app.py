@@ -51,54 +51,53 @@ def index():
 
 @app.route("/gerar", methods=["POST"])
 def gerar():
-    client_key = request.form.get("cliente")
+    clientes = request.form.getlist("clientes")
     periodo = request.form.get("periodo", "").strip()
     periodo_comp = request.form.get("periodo_comp", "").strip()
 
-    if not client_key or not periodo or not periodo_comp:
+    if not clientes or not periodo or not periodo_comp:
         return jsonify({"erro": "Preencha todos os campos."}), 400
 
-    # ── Todos os clientes → ZIP ───────────────────────────────────
-    if client_key == "todos":
-        zip_buf = io.BytesIO()
-        erros = []
-
-        with zipfile.ZipFile(zip_buf, "w", zipfile.ZIP_DEFLATED) as zf:
-            for key in CONFIG:
-                try:
-                    filename, buf = _gerar_um(key, periodo, periodo_comp)
-                    zf.writestr(filename, buf.read())
-                except Exception as e:
-                    erros.append(f"{key}: {e}")
-
-        if erros and zip_buf.tell() == 0:
-            return jsonify({"erro": "Nenhum relatório gerado.\n" + "\n".join(erros)}), 500
-
-        zip_buf.seek(0)
-        periodo_fmt = periodo.replace("/", "-").replace(" ", "")
-        zip_name = f"Reports_{periodo_fmt}.zip"
-
+    # ── Cliente único → PPTX ─────────────────────────────────────
+    if len(clientes) == 1:
+        key = clientes[0]
+        if key not in CONFIG:
+            return jsonify({"erro": "Cliente não encontrado."}), 400
+        try:
+            filename, buf = _gerar_um(key, periodo, periodo_comp)
+        except Exception as e:
+            return jsonify({"erro": f"Erro ao gerar relatório: {e}"}), 500
         return send_file(
-            zip_buf,
+            buf,
             as_attachment=True,
-            download_name=zip_name,
-            mimetype="application/zip",
+            download_name=filename,
+            mimetype="application/vnd.openxmlformats-officedocument.presentationml.presentation",
         )
 
-    # ── Cliente único → PPTX ─────────────────────────────────────
-    if client_key not in CONFIG:
-        return jsonify({"erro": "Cliente não encontrado."}), 400
+    # ── Múltiplos clientes → ZIP ──────────────────────────────────
+    zip_buf = io.BytesIO()
+    erros = []
 
-    try:
-        filename, buf = _gerar_um(client_key, periodo, periodo_comp)
-    except Exception as e:
-        return jsonify({"erro": f"Erro ao gerar relatório: {e}"}), 500
+    with zipfile.ZipFile(zip_buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        for key in clientes:
+            if key not in CONFIG:
+                continue
+            try:
+                filename, buf = _gerar_um(key, periodo, periodo_comp)
+                zf.writestr(filename, buf.read())
+            except Exception as e:
+                erros.append(f"{CONFIG[key]['nome']}: {e}")
 
+    if erros and zip_buf.tell() == 0:
+        return jsonify({"erro": "Nenhum relatório gerado.\n" + "\n".join(erros)}), 500
+
+    zip_buf.seek(0)
+    periodo_fmt = periodo.replace("/", "-").replace(" ", "")
     return send_file(
-        buf,
+        zip_buf,
         as_attachment=True,
-        download_name=filename,
-        mimetype="application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        download_name=f"Reports_{periodo_fmt}.zip",
+        mimetype="application/zip",
     )
 
 

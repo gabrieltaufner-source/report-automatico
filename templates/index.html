@@ -26,28 +26,18 @@
       max-width: 480px;
     }
 
-    h1 {
-      font-size: 22px;
-      font-weight: 700;
-      color: #111;
-      margin-bottom: 4px;
-    }
+    h1 { font-size: 22px; font-weight: 700; color: #111; margin-bottom: 4px; }
+    .subtitle { font-size: 14px; color: #888; margin-bottom: 32px; }
 
-    .subtitle {
-      font-size: 14px;
-      color: #888;
-      margin-bottom: 32px;
-    }
-
-    label {
+    .field-label {
       display: block;
       font-size: 13px;
       font-weight: 600;
       color: #444;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
 
-    select, input {
+    input[type="text"] {
       width: 100%;
       padding: 10px 14px;
       border: 1.5px solid #e0e0e0;
@@ -60,10 +50,57 @@
       margin-bottom: 20px;
     }
 
-    select:focus, input:focus {
-      border-color: #4f46e5;
-      background: #fff;
+    input[type="text"]:focus { border-color: #4f46e5; background: #fff; }
+
+    /* Checkbox list */
+    .client-list {
+      border: 1.5px solid #e0e0e0;
+      border-radius: 8px;
+      background: #fafafa;
+      margin-bottom: 20px;
+      overflow: hidden;
     }
+
+    .client-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: background 0.15s;
+      border-bottom: 1px solid #f0f0f0;
+      user-select: none;
+    }
+
+    .client-item:last-child { border-bottom: none; }
+    .client-item:hover { background: #f5f3ff; }
+
+    .client-item.todos {
+      font-weight: 600;
+      color: #4f46e5;
+      background: #f5f3ff;
+      border-bottom: 1.5px solid #e0e0e0;
+    }
+
+    .client-item input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: #4f46e5;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .client-name { font-size: 14px; color: #111; }
+    .client-tipo {
+      margin-left: auto;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 99px;
+      background: #e0e7ff;
+      color: #4f46e5;
+    }
+    .client-tipo.lead { background: #dcfce7; color: #16a34a; }
 
     button {
       width: 100%;
@@ -81,6 +118,8 @@
     button:hover { background: #4338ca; }
     button:disabled { background: #a5b4fc; cursor: not-allowed; }
 
+    .hint { font-size: 12px; color: #aaa; margin-top: -14px; margin-bottom: 20px; }
+
     .erro {
       margin-top: 16px;
       padding: 12px 16px;
@@ -91,13 +130,6 @@
       font-size: 14px;
       display: none;
     }
-
-    .hint {
-      font-size: 12px;
-      color: #aaa;
-      margin-top: -14px;
-      margin-bottom: 20px;
-    }
   </style>
 </head>
 <body>
@@ -106,20 +138,26 @@
     <p class="subtitle">Gerador de relatórios semanais de marketing digital</p>
 
     <form id="form">
-      <label for="cliente">Cliente</label>
-      <select id="cliente" name="cliente" required>
-        <option value="" disabled selected>Selecione o cliente</option>
-        <option value="todos">⚡ Todos os clientes</option>
+      <span class="field-label">Clientes</span>
+      <div class="client-list">
+        <label class="client-item todos">
+          <input type="checkbox" id="chk-todos" />
+          <span class="client-name">⚡ Todos os clientes</span>
+        </label>
         {% for c in clients %}
-        <option value="{{ c.key }}">{{ c.nome }}</option>
+        <label class="client-item">
+          <input type="checkbox" name="clientes" value="{{ c.key }}" class="chk-client" />
+          <span class="client-name">{{ c.nome }}</span>
+          <span class="client-tipo {% if c.tipo == 'lead' %}lead{% endif %}">{{ c.tipo }}</span>
+        </label>
         {% endfor %}
-      </select>
+      </div>
 
-      <label for="periodo">Período analisado</label>
+      <label class="field-label" for="periodo">Período analisado</label>
       <input id="periodo" name="periodo" type="text" placeholder="ex: 14/04 a 20/04" required />
       <p class="hint">Semana que será analisada no relatório</p>
 
-      <label for="periodo_comp">Período comparado</label>
+      <label class="field-label" for="periodo_comp">Período comparado</label>
       <input id="periodo_comp" name="periodo_comp" type="text" placeholder="ex: 07/04 a 13/04" required />
       <p class="hint">Semana anterior (para calcular variações)</p>
 
@@ -129,15 +167,38 @@
   </div>
 
   <script>
+    // Todos → marca/desmarca todos
+    const chkTodos = document.getElementById("chk-todos");
+    const chkClients = document.querySelectorAll(".chk-client");
+
+    chkTodos.addEventListener("change", () => {
+      chkClients.forEach(c => c.checked = chkTodos.checked);
+    });
+
+    chkClients.forEach(c => c.addEventListener("change", () => {
+      chkTodos.checked = [...chkClients].every(c => c.checked);
+    }));
+
     document.getElementById("form").addEventListener("submit", async function(e) {
       e.preventDefault();
       const btn = document.getElementById("btn");
       const erro = document.getElementById("erro");
       erro.style.display = "none";
+
+      const selecionados = [...chkClients].filter(c => c.checked).map(c => c.value);
+      if (selecionados.length === 0) {
+        erro.textContent = "Selecione ao menos um cliente.";
+        erro.style.display = "block";
+        return;
+      }
+
       btn.disabled = true;
       btn.textContent = "Gerando...";
 
       const formData = new FormData(this);
+      // Remove checkboxes antigos e re-adiciona só os selecionados
+      formData.delete("clientes");
+      selecionados.forEach(v => formData.append("clientes", v));
 
       try {
         const res = await fetch("/gerar", { method: "POST", body: formData });
@@ -147,8 +208,8 @@
           const url = URL.createObjectURL(blob);
           const a = document.createElement("a");
           const cd = res.headers.get("Content-Disposition") || "";
-          const match = cd.match(/filename="?([^"]+)"?/);
-          a.download = match ? match[1] : "relatorio.pptx";
+          const match = cd.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+          a.download = match ? match[1].replace(/['"]/g, "") : "relatorio.zip";
           a.href = url;
           a.click();
           URL.revokeObjectURL(url);
