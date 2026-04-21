@@ -1,0 +1,53 @@
+{
+  "haux": {
+    "nome": "Haux",
+    "planilha": "2026-Haux- Painel de Controle Ecomm.xlsx",
+    "sheet_id": "1zGnNPXuTccKdBL-ED8Sd7R_IQGWRY_lPq-Zrtfn0sRg",
+    "tipo": "ecommerce",
+    "pasta_drive": "/Users/mac0024/Google Drive/Reports/Haux",
+    "metas": {
+      "faturamento_mensal": 100000,
+      "investimento_mensal": 15000
+    }
+  },
+  "emerald": {
+    "nome": "Emerald Turism Heath",
+    "planilha": "2026 Painel de Controle Lead - Emerald.xlsx",
+    "tipo": "lead",
+    "pasta_drive": "/Users/mac0024/Google Drive/Reports/Emerald",
+    "metas": {
+      "leads_mensal": 200,
+      "investimento_mensal": 8000
+    }
+  },
+  "glulac": {
+    "nome": "Glulac",
+    "planilha": "2026 Painel de Controle Ecomm - Glulac.xlsx",
+    "tipo": "ecommerce",
+    "pasta_drive": "/Users/mac0024/Google Drive/Reports/Glulac",
+    "metas": {
+      "faturamento_mensal": 50000,
+      "investimento_mensal": 5000
+    }
+  },
+  "piknik": {
+    "nome": "Piknik",
+    "planilha": "2026-Piknik - Painel de Controle Ecomm.xlsx",
+    "tipo": "ecommerce",
+    "pasta_drive": "/Users/mac0024/Google Drive/Reports/Piknik",
+    "metas": {
+      "faturamento_mensal": 50000,
+      "investimento_mensal": 5000
+    }
+  },
+  "sim_cerveja": {
+    "nome": "Sim Cerveja",
+    "planilha": "Sim cerveja - Painel de Controle Ecomm.xlsx",
+    "tipo": "ecommerce",
+    "pasta_drive": "/Users/mac0024/Google Drive/Reports/Sim Cerveja",
+    "metas": {
+      "faturamento_mensal": 50000,
+      "investimento_mensal": 5000
+    }
+  }
+}
