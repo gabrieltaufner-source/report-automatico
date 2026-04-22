@@ -42,8 +42,11 @@ def _gerar_um(client_key: str, periodo: str, periodo_comp: str):
     # Upload para o Google Drive (não bloqueia o download em caso de falha)
     try:
         upload_to_drive(io.BytesIO(buf.getvalue()), filename)
+        print(f"[Drive] ✅ Salvo: {filename}")
     except Exception as e:
-        print(f"[Drive] Falha ao salvar {filename}: {e}")
+        import traceback
+        print(f"[Drive] ❌ Falha ao salvar {filename}: {e}")
+        traceback.print_exc()
 
     buf.seek(0)
     return filename, buf
@@ -82,6 +85,19 @@ def gerar():
         download_name=filename,
         mimetype="application/vnd.openxmlformats-officedocument.presentationml.presentation",
     )
+
+
+@app.route("/test-drive")
+def test_drive():
+    try:
+        from google_sheets import upload_to_drive, DRIVE_OUTPUT_FOLDER
+        import io
+        buf = io.BytesIO(b"teste")
+        upload_to_drive(buf, "_teste_conexao.txt", DRIVE_OUTPUT_FOLDER)
+        return jsonify({"status": "ok", "mensagem": "Upload funcionando!"})
+    except Exception as e:
+        import traceback
+        return jsonify({"status": "erro", "mensagem": str(e), "detalhe": traceback.format_exc()}), 500
 
 
 if __name__ == "__main__":
