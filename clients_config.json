@@ -4,17 +4,18 @@
     "planilha": "2026-Haux- Painel de Controle Ecomm.xlsx",
     "sheet_id": "1zGnNPXuTccKdBL-ED8Sd7R_IQGWRY_lPq-Zrtfn0sRg",
     "tipo": "ecommerce",
-    "pasta_drive": "/Users/mac0024/Google Drive/Reports/Haux",
+    "pasta_drive": "",
     "metas": {
       "faturamento_mensal": 100000,
       "investimento_mensal": 15000
     }
   },
   "emerald": {
-    "nome": "Emerald Turism Heath",
+    "nome": "Emerald Medical Tourism",
     "planilha": "2026 Painel de Controle Lead - Emerald.xlsx",
+    "sheet_id": "12gobGzd5z_YPYd3vEAw5Z5s-YBzOWZgsE93_R0qPj4k",
     "tipo": "lead",
-    "pasta_drive": "/Users/mac0024/Google Drive/Reports/Emerald",
+    "pasta_drive": "",
     "metas": {
       "leads_mensal": 200,
       "investimento_mensal": 8000
@@ -23,8 +24,9 @@
   "glulac": {
     "nome": "Glulac",
     "planilha": "2026 Painel de Controle Ecomm - Glulac.xlsx",
+    "sheet_id": "1xeLU8jOLH7k9uIMG_ySeHQGm5vwWIJg_suGnE2vQWGY",
     "tipo": "ecommerce",
-    "pasta_drive": "/Users/mac0024/Google Drive/Reports/Glulac",
+    "pasta_drive": "",
     "metas": {
       "faturamento_mensal": 50000,
       "investimento_mensal": 5000
@@ -33,18 +35,75 @@
   "piknik": {
     "nome": "Piknik",
     "planilha": "2026-Piknik - Painel de Controle Ecomm.xlsx",
+    "sheet_id": "11BPKsdVOxOsNEmezZ78IypFiLZ0IhR_xcUTh4XBkdJ8",
     "tipo": "ecommerce",
-    "pasta_drive": "/Users/mac0024/Google Drive/Reports/Piknik",
+    "pasta_drive": "",
     "metas": {
       "faturamento_mensal": 50000,
       "investimento_mensal": 5000
     }
   },
   "sim_cerveja": {
-    "nome": "Sim Cerveja",
+    "nome": "Sim! Cerveja",
     "planilha": "Sim cerveja - Painel de Controle Ecomm.xlsx",
+    "sheet_id": "1PwbnWu30614NO0xOMdpNWWjzj4OT_wxSkbRtIbBcR84",
     "tipo": "ecommerce",
-    "pasta_drive": "/Users/mac0024/Google Drive/Reports/Sim Cerveja",
+    "pasta_drive": "",
+    "metas": {
+      "faturamento_mensal": 50000,
+      "investimento_mensal": 5000
+    }
+  },
+  "tua_cosmeticos": {
+    "nome": "Tuá Cosméticos",
+    "planilha": "tua_cosmeticos.xlsx",
+    "sheet_id": "1iBmck7B3OYAce5SoR5QN3ux4bwi6Wqt8",
+    "tipo": "ecommerce",
+    "pasta_drive": "",
+    "metas": {
+      "faturamento_mensal": 50000,
+      "investimento_mensal": 5000
+    }
+  },
+  "yellowfin": {
+    "nome": "Yellowfin",
+    "planilha": "yellowfin.xlsx",
+    "sheet_id": "1RUCuDWz4ttWdguwDq5fOZcz_vDYWvH8tH4arArRreVI",
+    "tipo": "ecommerce",
+    "pasta_drive": "",
+    "metas": {
+      "faturamento_mensal": 50000,
+      "investimento_mensal": 5000
+    }
+  },
+  "papelaria_colmeia": {
+    "nome": "Papelaria Colmeia",
+    "planilha": "papelaria_colmeia.xlsx",
+    "sheet_id": "1dpZKSvry7io0hXcAOYegA1Wv0YHVPQemEbC36qSZEYo",
+    "tipo": "lead",
+    "pasta_drive": "",
+    "metas": {
+      "leads_mensal": 100,
+      "investimento_mensal": 3000
+    }
+  },
+  "classy_smash": {
+    "nome": "Classy Smash",
+    "planilha": "classy_smash.xlsx",
+    "sheet_id": "1jkIsbJWO6ewfTChzwNMBIvvA6Tq_Tl3AsQYyEc_MHNk",
+    "tipo": "lead",
+    "pasta_drive": "",
+    "metas": {
+      "leads_mensal": 100,
+      "investimento_mensal": 3000
+    }
+  },
+  "lotus_forme": {
+    "nome": "Lotus Forme",
+    "planilha": "lotus_forme.xlsx",
+    "sheet_id": "1oWL2rF4rc9pia9viicGVATciRqh5QwXfE_mBwm5DD8A",
+    "tipo": "ecommerce",
+    "pasta_drive": "",
     "metas": {
       "faturamento_mensal": 50000,
       "investimento_mensal": 5000
