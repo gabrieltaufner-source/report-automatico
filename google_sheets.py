@@ -9,7 +9,7 @@ import json
 
 SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets.readonly",
-    "https://www.googleapis.com/auth/drive.file",
+    "https://www.googleapis.com/auth/drive",
 ]
 
 DRIVE_OUTPUT_FOLDER = "16ZDrAjwh2VREgWGX_myP4fi6DswNIEM1"
