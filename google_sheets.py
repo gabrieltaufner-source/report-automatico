@@ -1,29 +1,30 @@
 """
-Lê dados do Google Sheets.
-- Render/servidor: usa Service Account via variável de ambiente GOOGLE_SERVICE_ACCOUNT_JSON
-- Local (primeira vez): abre navegador para autenticação OAuth e salva token.json
+Integração com Google Sheets (leitura) e Google Drive (upload).
+- Render/servidor: usa Service Account via variável GOOGLE_SERVICE_ACCOUNT_JSON
+- Local: OAuth com browser (salva token.json)
 """
+import io
 import os
 import json
 
-SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
+SCOPES = [
+    "https://www.googleapis.com/auth/spreadsheets.readonly",
+    "https://www.googleapis.com/auth/drive.file",
+]
+
+DRIVE_OUTPUT_FOLDER = "11YttBfIBE1ofkX3oq9GTRgBSdNXroA4z"
+
 BASE_DIR = os.path.dirname(__file__)
 CREDENTIALS_FILE = os.path.join(BASE_DIR, "credentials.json")
 TOKEN_FILE = os.path.join(BASE_DIR, "token.json")
 
 
-def _get_service():
-    from googleapiclient.discovery import build
-
-    # Service Account (Render / produção)
+def _get_credentials():
     sa_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON")
     if sa_json:
         from google.oauth2.service_account import Credentials
-        info = json.loads(sa_json)
-        creds = Credentials.from_service_account_info(info, scopes=SCOPES)
-        return build("sheets", "v4", credentials=creds)
+        return Credentials.from_service_account_info(json.loads(sa_json), scopes=SCOPES)
 
-    # OAuth local
     from google.oauth2.credentials import Credentials
     from google_auth_oauthlib.flow import InstalledAppFlow
     from google.auth.transport.requests import Request
@@ -41,11 +42,13 @@ def _get_service():
         with open(TOKEN_FILE, "w") as f:
             f.write(creds.to_json())
 
-    return build("sheets", "v4", credentials=creds)
+    return creds
 
 
 def read_sheet(sheet_id: str, aba: str = "Acompanhamento Geral") -> list:
-    service = _get_service()
+    from googleapiclient.discovery import build
+    creds = _get_credentials()
+    service = build("sheets", "v4", credentials=creds)
     result = (
         service.spreadsheets()
         .values()
@@ -57,3 +60,30 @@ def read_sheet(sheet_id: str, aba: str = "Acompanhamento Geral") -> list:
         .execute()
     )
     return result.get("values", [])
+
+
+def upload_to_drive(buf: io.BytesIO, filename: str, folder_id: str = DRIVE_OUTPUT_FOLDER):
+    """Faz upload de um buffer PPTX para o Google Drive."""
+    from googleapiclient.discovery import build
+    from googleapiclient.http import MediaIoBaseUpload
+
+    creds = _get_credentials()
+    service = build("drive", "v3", credentials=creds)
+
+    buf.seek(0)
+    media = MediaIoBaseUpload(
+        buf,
+        mimetype="application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        resumable=False,
+    )
+
+    file_metadata = {
+        "name": filename,
+        "parents": [folder_id],
+    }
+
+    service.files().create(
+        body=file_metadata,
+        media_body=media,
+        fields="id",
+    ).execute()

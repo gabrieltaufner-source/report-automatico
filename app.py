@@ -17,7 +17,9 @@ with open(CONFIG_PATH, encoding="utf-8") as f:
 
 
 def _gerar_um(client_key: str, periodo: str, periodo_comp: str):
-    """Gera o relatório de um cliente. Retorna (filename, BytesIO) ou levanta exceção."""
+    """Gera o relatório de um cliente, salva no Drive e retorna (filename, BytesIO)."""
+    from google_sheets import upload_to_drive
+
     client = CONFIG[client_key]
     tipo = client.get("tipo", "ecommerce")
     sheet_id = client.get("sheet_id")
@@ -36,6 +38,14 @@ def _gerar_um(client_key: str, periodo: str, periodo_comp: str):
     buf = fill_template_to_buffer(tipo, dados)
     nome = client["nome"].replace(" ", "_")
     filename = f"{nome}_{periodo.replace('/', '-').replace(' ', '')}.pptx"
+
+    # Upload para o Google Drive (não bloqueia o download em caso de falha)
+    try:
+        upload_to_drive(io.BytesIO(buf.getvalue()), filename)
+    except Exception as e:
+        print(f"[Drive] Falha ao salvar {filename}: {e}")
+
+    buf.seek(0)
     return filename, buf
 
 
