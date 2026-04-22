@@ -12,7 +12,7 @@ SCOPES = [
     "https://www.googleapis.com/auth/drive.file",
 ]
 
-DRIVE_OUTPUT_FOLDER = "11YttBfIBE1ofkX3oq9GTRgBSdNXroA4z"
+DRIVE_OUTPUT_FOLDER = "1FJd0MyZSXiD6gE70l7LVkNfuTmg7KEvy"
 
 BASE_DIR = os.path.dirname(__file__)
 CREDENTIALS_FILE = os.path.join(BASE_DIR, "credentials.json")
