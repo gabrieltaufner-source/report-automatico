@@ -38,7 +38,7 @@ def _get_credentials():
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(CREDENTIALS_FILE, SCOPES)
-            creds = flow.run_local_server(port=8080)
+            creds = flow.run_local_server(port=8090)
         with open(TOKEN_FILE, "w") as f:
             f.write(creds.to_json())
 
@@ -86,4 +86,5 @@ def upload_to_drive(buf: io.BytesIO, filename: str, folder_id: str = DRIVE_OUTPU
         body=file_metadata,
         media_body=media,
         fields="id",
+        supportsAllDrives=True,
     ).execute()
