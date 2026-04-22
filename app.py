@@ -92,39 +92,32 @@ def test_drive():
     import traceback
     try:
         from googleapiclient.discovery import build
-        from google_sheets import _get_credentials, upload_to_drive, DRIVE_OUTPUT_FOLDER
+        from googleapiclient.http import MediaIoBaseUpload
+        from google_sheets import _get_credentials, DRIVE_OUTPUT_FOLDER
 
         creds = _get_credentials()
         service = build("drive", "v3", credentials=creds)
 
-        # Diagnóstico: verifica se a pasta existe e se está num Shared Drive
-        folder_meta = service.files().get(
-            fileId=DRIVE_OUTPUT_FOLDER,
-            fields="id,name,driveId",
+        # Lista os Shared Drives acessíveis pela service account (diagnóstico)
+        drives = service.drives().list(fields="drives(id,name)").execute()
+
+        # Tenta upload direto para a pasta configurada
+        buf = io.BytesIO(b"teste de upload")
+        buf.seek(0)
+        media = MediaIoBaseUpload(buf, mimetype="text/plain", resumable=False)
+        result = service.files().create(
+            body={"name": "_teste_conexao.txt", "parents": [DRIVE_OUTPUT_FOLDER]},
+            media_body=media,
+            fields="id,parents",
             supportsAllDrives=True,
         ).execute()
 
-        drive_id = folder_meta.get("driveId")
-        if not drive_id:
-            return jsonify({
-                "status": "erro",
-                "mensagem": (
-                    "A pasta NÃO está dentro de um Drive Compartilhado. "
-                    "Ela ainda pertence ao 'Meu Drive' pessoal. "
-                    "Crie um Drive Compartilhado pelo menu lateral esquerdo do Google Drive "
-                    "e mova ou recrie a pasta dentro dele."
-                ),
-                "folder_meta": folder_meta,
-            }), 400
-
-        # Tenta o upload de fato
-        buf = io.BytesIO(b"teste de upload")
-        upload_to_drive(buf, "_teste_conexao.txt", DRIVE_OUTPUT_FOLDER)
         return jsonify({
             "status": "ok",
             "mensagem": "Upload funcionando!",
-            "pasta": folder_meta.get("name"),
-            "driveId": drive_id,
+            "file_id": result.get("id"),
+            "drives_visiveis": drives.get("drives", []),
+            "folder_id_usado": DRIVE_OUTPUT_FOLDER,
         })
     except Exception as e:
         return jsonify({"status": "erro", "mensagem": str(e), "detalhe": traceback.format_exc()}), 500
